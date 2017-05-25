@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="90">
+  <server artifactsdir="artifacts" agentAutoRegisterKey="554af166-f141-42ab-a1a1-b6fa0c342a11" commandRepositoryLocation="default" serverId="bdd0ff83-6cc6-46ea-b0e1-f9a0e78460b3" />
+  <pipelines group="defaultGroup" />
+  <pipelines group="newGrp">
+    <pipeline name="PipeLineA">
+      <materials>
+        <git url="https://github.com/kashfiarahman89688/getting-started-repo.git" />
+      </materials>
+      <stage name="defaultStage">
+        <jobs>
+          <job name="defaultJob">
+            <tasks>
+              <exec command="./build" />
+            </tasks>
+            <artifacts>
+              <artifact src="my-artifact.html" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="PipeLineB">
+      <materials>
+        <pipeline pipelineName="PipeLineA" stageName="defaultStage" />
+      </materials>
+      <stage name="defaultStage">
+        <jobs>
+          <job name="defaultJob">
+            <tasks>
+              <fetchartifact pipeline="PipeLineA" stage="defaultStage" job="defaultJob" srcfile="my-artifact.html">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="type">
+                <arg>my-artifact.html</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="PipeLineD">
+      <materials>
+        <pipeline pipelineName="PipeLineB" stageName="defaultStage" />
+        <pipeline pipelineName="PipeLineC" stageName="defaultStage" materialName="pipelineC" />
+      </materials>
+      <stage name="defaultStage">
+        <jobs>
+          <job name="defaultJob">
+            <tasks>
+              <fetchartifact pipeline="PipeLineA/PipeLineB" stage="defaultStage" job="defaultJob" srcfile="my-artifact.html">
+                <runif status="passed" />
+              </fetchartifact>
+              <exec command="type">
+                <arg>my-artifact.html</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="PipeLineC">
+      <materials>
+        <git url="https://github.com/kashfiarahman89688/getting-started-repo.git" />
+        <pipeline pipelineName="PipeLineA" stageName="defaultStage" materialName="pipelineA" />
+      </materials>
+      <stage name="defaultStage">
+        <jobs>
+          <job name="defaultJob">
+            <tasks>
+              <exec command="./build" />
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+  <agents>
+    <agent hostname="Kashfia-PC" ipaddress="127.0.0.1" uuid="ceec4964-c732-4a15-b0a9-c949d5bbd448" />
+  </agents>
+</cruise>
